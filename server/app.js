@@ -1,10 +1,15 @@
 import Koa from "koa";
+import glob from "glob";
 
 // get koa app
 const app = new Koa();
 
-app.use(async ctx => {
-  ctx.body = 'Hello World';
+// load all controllers
+glob(`${__dirname}/controller/*.js`, (err, files) => {
+  files.forEach(file => {
+    const fileContent = require(file).default;
+    app.use(fileContent.routes()).use(fileContent.allowedMethods());
+  });
 });
 
 // port
